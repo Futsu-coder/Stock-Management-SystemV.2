@@ -16,7 +16,7 @@ body{
 }
 
 .main-content {
-  background-color: #333;
+  background-color: #00ef70;
   padding: 30px;
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -34,7 +34,6 @@ h1, h2, h3 {
   width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
-  background-color: #444;
 }
 
 .product-table th, .product-table td {
@@ -42,6 +41,8 @@ h1, h2, h3 {
   padding: 12px;
   text-align: left;
   color: #fff;
+  background-color: #c70000;
+
 }
 
 .product-table th {

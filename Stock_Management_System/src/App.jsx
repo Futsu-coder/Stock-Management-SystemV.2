@@ -2,20 +2,21 @@
 
 import { useState, useEffect } from 'react';
 import DB from './DB';
+import Modal from './Modal';
 
 function App() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        // แก้ไขชื่อตาราง 'product' เป็นตัวพิมพ์เล็ก
         const { data, error } = await DB
           .from('product')
           .select('*')
-          // แก้ไขชื่อคอลัมน์ 'productid' เป็นตัวพิมพ์เล็ก
           .order('productid', { ascending: true });
 
         if (error) throw error;
@@ -30,12 +31,53 @@ function App() {
     };
 
     fetchProducts();
-  }, []);
+  }, []);  
+  const handleUpdateQuantity = (product) => {
+    setSelectedProduct(product);
+    setIsModalOpen(true);
+  };
+  
+  // สร้างฟังก์ชันสำหรับปิด Modal
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedProduct(null);
+  };
+   // สร้างฟังก์ชันเพื่อจัดการการบันทึกจำนวนสินค้า
+  const handleSaveQuantity = async (productId, quantity) => {
+    try {
+      // ค้นหาสินค้าที่ต้องการอัปเดตจาก State
+      const productToUpdate = products.find(p => p.productid === productId);
+      if (!productToUpdate) throw new Error("ไม่พบสินค้า");
+
+      // คำนวณจำนวนใหม่
+      const newQuantity = productToUpdate.initialquantity + quantity;
+
+      // ส่งข้อมูลไปอัปเดตในฐานข้อมูล (สมมติว่าใช้ Supabase หรือ DB ที่มี update function)
+      const {error } = await DB
+        .from('product')
+        .update({ initialquantity: newQuantity })
+        .eq('productid', productId);
+      
+      if (error) throw error;
+
+      // อัปเดต State ใน React เพื่อให้หน้าจอแสดงผลทันที
+      setProducts(products.map(p => 
+        p.productid === productId ? { ...p, initialquantity: newQuantity } : p
+      ));
+
+      console.log('อัปเดตจำนวนสินค้าสำเร็จ!');
+
+    } catch (e) {
+      setError('ไม่สามารถอัปเดตจำนวนสินค้าได้: ' + e.message);
+      console.error('Error updating quantity:', e);
+    }
+  };
 
   if (loading) return <div className="loading">กำลังโหลดข้อมูล...</div>;
   if (error) return <div className="error">{error}</div>;
 
   return (
+
     <div className="pos-container">
       <header className="header">
         <h1>ระบบจัดการสินค้า (POS)</h1>
@@ -50,7 +92,9 @@ function App() {
                 <th>ชื่อสินค้า</th>
                 <th>SKU</th>
                 <th>ราคา</th>
-                <th>จำนวนเริ่มต้น</th>
+                <th>จำนวน</th>
+                <th>เกณฑ์ขั้นต่ำ</th>
+                <th>รายการเพิ่มเติม</th>
               </tr>
             </thead>
             <tbody>
@@ -61,15 +105,26 @@ function App() {
                   <td>{product.productname}</td>
                   <td>{product.sku}</td>
                   <td>{product.price} บาท</td>
-                  <td>{product.initialquantity}</td>
+                  <td>{product.initialquantity} ชิ้น</td>
+                  <td>{product.minimumcriteria} ชิ้น</td>
+                  <td><button onClick={() => handleUpdateQuantity(product)}>
+                      เพิ่มลดจำนวนสินค้า
+                    </button></td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
       </main>
+      {}
+      <Modal
+        isVisible={isModalOpen}
+        product={selectedProduct}
+        onClose={closeModal}
+        onSave={handleSaveQuantity}
+      />
     </div>
   );
 }
-
 export default App;
+
