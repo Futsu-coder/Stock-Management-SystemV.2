@@ -32,6 +32,7 @@ function App() {
 
     fetchProducts();
   }, []);  
+
   const handleUpdateQuantity = (product) => {
     setSelectedProduct(product);
     setIsModalOpen(true);
@@ -43,35 +44,33 @@ function App() {
     setSelectedProduct(null);
   };
    // สร้างฟังก์ชันเพื่อจัดการการบันทึกจำนวนสินค้า
-  const handleSaveQuantity = async (productId, quantity) => {
-    try {
-      // ค้นหาสินค้าที่ต้องการอัปเดตจาก State
-      const productToUpdate = products.find(p => p.productid === productId);
-      if (!productToUpdate) throw new Error("ไม่พบสินค้า");
+const handleSaveQuantity = async (productId, quantity) => {
+  try {
+    const productToUpdate = products.find(p => p.productid === productId);
+    if (!productToUpdate) throw new Error("ไม่พบสินค้า");
 
-      // คำนวณจำนวนใหม่
-      const newQuantity = productToUpdate.initialquantity + quantity;
+    // คำนวณจำนวนใหม่
+    // หาก quantity เป็นบวกจะเพิ่ม หากเป็นลบจะลด
+    const newQuantity = productToUpdate.initialquantity + quantity;
 
-      // ส่งข้อมูลไปอัปเดตในฐานข้อมูล (สมมติว่าใช้ Supabase หรือ DB ที่มี update function)
-      const {error } = await DB
-        .from('product')
-        .update({ initialquantity: newQuantity })
-        .eq('productid', productId);
-      
-      if (error) throw error;
+    const { error } = await DB
+      .from('product')
+      .update({ initialquantity: newQuantity })
+      .eq('productid', productId);
+    
+    if (error) throw error;
 
-      // อัปเดต State ใน React เพื่อให้หน้าจอแสดงผลทันที
-      setProducts(products.map(p => 
-        p.productid === productId ? { ...p, initialquantity: newQuantity } : p
-      ));
+    setProducts(products.map(p => 
+      p.productid === productId ? { ...p, initialquantity: newQuantity } : p
+    ));
 
-      console.log('อัปเดตจำนวนสินค้าสำเร็จ!');
+    console.log('อัปเดตจำนวนสินค้าสำเร็จ!');
 
-    } catch (e) {
-      setError('ไม่สามารถอัปเดตจำนวนสินค้าได้: ' + e.message);
-      console.error('Error updating quantity:', e);
-    }
-  };
+  } catch (e) {
+    setError('ไม่สามารถอัปเดตจำนวนสินค้าได้: ' + e.message);
+    console.error('Error updating quantity:', e);
+  }
+};
 
   if (loading) return <div className="loading">กำลังโหลดข้อมูล...</div>;
   if (error) return <div className="error">{error}</div>;
@@ -80,7 +79,7 @@ function App() {
 
     <div className="pos-container">
       <header className="header">
-        <h1>ระบบจัดการสินค้า (POS)</h1>
+        <h1>คลังสินค้า</h1>
       </header>
       <main className="main-content">
         <h2>รายการสินค้า</h2>
@@ -100,7 +99,6 @@ function App() {
             <tbody>
               {products.map((product) => (
                 <tr key={product.productid}>
-                  {/* แก้ไขชื่อคอลัมน์เป็นตัวพิมพ์เล็ก */}
                   <td>{product.productid}</td>
                   <td>{product.productname}</td>
                   <td>{product.sku}</td>

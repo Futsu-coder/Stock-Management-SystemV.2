@@ -1,16 +1,24 @@
 import React, { useState } from 'react';
 
 const Modal = ({ isVisible, product, onClose, onSave }) => {
+  // สร้าง State สำหรับประเภทการทำรายการ ('add' หรือ 'subtract') และจำนวนสินค้า
+  const [transactionType, setTransactionType] = useState('add');
   const [quantity, setQuantity] = useState(0);
 
   if (!isVisible) return null;
 
   const handleSave = () => {
-    if (quantity === 0) {
-      alert("กรุณากรอกจำนวนที่ต้องการเพิ่ม/ลด");
+    // ตรวจสอบว่าจำนวนที่กรอกมากกว่า 0 หรือไม่
+    if (quantity <= 0) {
+      alert("กรุณากรอกจำนวนสินค้าที่ถูกต้อง");
       return;
     }
-    onSave(product.productid, quantity);
+    
+    // ส่งค่า transactionType และ quantity ไปที่คอมโพเนนต์หลัก
+    // ตัวอย่าง: ถ้าเลือก 'subtract' และกรอก 5, จะส่งค่าเป็น -5
+    const finalQuantity = transactionType === 'add' ? quantity : -quantity;
+    
+    onSave(product.productid, finalQuantity);
     onClose();
   };
 
@@ -21,12 +29,20 @@ const Modal = ({ isVisible, product, onClose, onSave }) => {
         <p>จำนวนปัจจุบัน: {product?.initialquantity}</p>
         
         <div className="modal-input-group">
-          <label htmlFor="quantity-input">จำนวนที่ต้องการเพิ่ม/ลด:</label>
+          {/* เพิ่ม dropdown สำหรับเลือกประเภท */}
+          <select
+            value={transactionType}
+            onChange={(e) => setTransactionType(e.target.value)}
+          >
+            <option value="add">เพิ่มจำนวนสินค้า (+)</option>
+            <option value="subtract">ลดจำนวนสินค้า (-)</option>
+          </select>
+
           <input
             type="number"
-            id="quantity-input"
             value={quantity}
             onChange={(e) => setQuantity(parseInt(e.target.value))}
+            min="0" // กำหนดให้จำนวนต้องมากกว่าหรือเท่ากับ 0
           />
         </div>
 
