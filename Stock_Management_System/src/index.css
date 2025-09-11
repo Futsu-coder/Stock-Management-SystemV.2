@@ -39,10 +39,9 @@ h1, h2, h3 {
 .product-table th, .product-table td {
   border: 1px solid #555;
   padding: 12px;
-  text-align: left;
+  text-align: center;
   color: #fff;
-  background-color: #c70000;
-
+  background-color: #c70000
 }
 
 .product-table th {
@@ -119,10 +118,18 @@ h1, h2, h3 {
 
 .modal-actions {
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
   gap: 1rem;
 }
-
+.btn_plus_minus{
+  background-color: #007bff;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-left: 3px;
+}
 .btn {
   padding: 0.75rem 1.5rem;
   border: none;
@@ -164,4 +171,41 @@ h1, h2, h3 {
   border-radius: 4px;
   text-align: center;
   font-size: 1rem;
+}
+/* สำหรับปุ่มแก้ไข */
+.btn-edit {
+  background-color: #007bff;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-left: 3px;
+}
+
+
+
+/* สำหรับกลุ่มฟอร์มใน Modal */
+.modal-form-group {
+  margin-bottom: 1rem;
+  text-align: left;
+}
+
+.modal-form-group label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.modal-form-group input {
+  width: 95%;
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+.modal-form-group select{
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
